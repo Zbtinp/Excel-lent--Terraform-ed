@@ -1,8 +1,11 @@
-import openpyxl as xl
-# import sys
-from terraformpy import Provider, Resource
+import json
 
-# excel_file = sys.argv[1]
+import openpyxl as xl
+# from terraformpy import Provider, Resource
+
+import terrascript
+import terrascript.provider as provider
+import terrascript.resource as resource
 
 wb = xl.load_workbook("aws_info.xlsx", data_only=True)
 
@@ -57,28 +60,46 @@ for a, b, c in cells5:
     else:
         break
 
+# print("AWS Instance:")
+# print(aws_instances)
+# print("AWS Security Groups:")
+# print(aws_security_groups)
+# print("Ing Eg:")
+# print(Ing_Eg)
+# print("SSH Keys:")
+# print(SSH_Keys)
 
-print("AWS Instance:")
-print(aws_instances)
-print("AWS Security Groups:")
-print(aws_security_groups)
-print("Ing Eg:")
-print(Ing_Eg)
-print("SSH Keys:")
-print(SSH_Keys)
-print("Providers:")
-print(Providers)
+# for key in SSH_Keys.keys():
+#     print(key)
+#     print(SSH_Keys[key][0])
+#     print(SSH_Keys[key][1])
 
-# for provider in Providers.keys():
-#     Provider(
-#         'aws',
-#         profile = 'default',
-#         region = provider,
-#
+config = ""
 
-#     )
-#
-# for SHHKey in SSH_Keys.keys():
-#     privateKey[SHHKey] = tls_private_key(
-#
-#     )
+def build_provider(region, access_key, secret_key):
+    return 'provider "aws" {\n region = "' + region + '"\n access_key = "' + access_key + '"\n secret_key = "' + secret_key + '" \n } \n \n'
+
+def build_resource(kind, name, *args):
+    flag = True
+    setup = 'resource "' + kind + '" "' + name + '" { \n '
+    for num in args:
+        # setup += str(num) + '\n'
+        if flag:
+            setup += str(num) + ' = '
+            flag = False
+        else:
+            setup += str(num) + ' \n'
+    return setup
+
+
+
+
+for provider in Providers.keys():
+    config += build_provider(provider, Providers[provider][0], Providers[provider][1]);
+
+for key in SSH_Keys.keys():
+    config += build_resource('tls_private_key', 'pemaster', SSH_Keys[key][0], SSH_Keys[key][1])
+
+outfile = open("test.tf", "w+")
+outfile.write(config)
+outfile.close
