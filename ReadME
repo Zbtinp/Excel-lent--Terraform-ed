@@ -1,0 +1,5 @@
+This project is meant to take a defined set of cloud requirements and convert it into a Terraform file. 
+Allowing the user to automate the creation of Terraform files and therefore provision required AWS resourses just by interacting with the Excel file. 
+
+The project I was working on had a specific layout mentioned in their specifications which allowed me to standardize this.
+The project was later stopped due to Covid-19 and remains dormant for now. 
